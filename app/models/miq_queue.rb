@@ -48,6 +48,7 @@ class MiqQueue < ApplicationRecord
       # internally the client will track the state of the connection and re-open it,
       # once it's available again - at least thats true for a stomp connection
       options = messaging_client_options&.merge(:client_ref => client_ref)
+      _log.info("messaging options: #{options}")
       return if options.nil?
 
       ManageIQ::Messaging::Client.open(options)
@@ -677,7 +678,7 @@ class MiqQueue < ApplicationRecord
   private_class_method def self.messaging_options_from_env
     return unless ENV["MESSAGING_HOSTNAME"] && ENV["MESSAGING_PORT"] && ENV["MESSAGING_USERNAME"] && ENV["MESSAGING_PASSWORD"]
 
-    {
+    options = {
       :host     => ENV["MESSAGING_HOSTNAME"],
       :port     => ENV["MESSAGING_PORT"].to_i,
       :username => ENV["MESSAGING_USERNAME"],
@@ -685,6 +686,15 @@ class MiqQueue < ApplicationRecord
       :protocol => ENV.fetch("MESSAGING_PROTOCOL", "Kafka"),
       :encoding => ENV.fetch("MESSAGING_ENCODING", "json")
     }
+
+    if ENV["MESSAGING_ENABLE_SSL"].present?
+      options[:ssl] = true
+      options[:ca_file] = "/etc/pki/ca-trust/source/anchors/root.crt"
+      options[:keystore_location] = "/etc/pki/ca-trust/source/anchors/kafka.keystore.jks"
+      options[:keystore_password] = "nasar123"
+    end
+
+    options
   end
 
   MESSAGING_CONFIG_FILE = Rails.root.join("config", "messaging.yml")

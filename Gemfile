@@ -48,7 +48,7 @@ gem "linux_admin",                      "~>2.0", ">=2.0.1",  :require => false
 gem "listen",                           "~>3.2",             :require => false
 gem "manageiq-api-client",              "~>0.3.6",           :require => false
 gem "manageiq-loggers",                 "~>1.0",             :require => false
-gem "manageiq-messaging",               "~>1.0", ">=1.2.0",  :require => false
+gem "manageiq-messaging",              :git => "https://github.com/nasark/manageiq-messaging", :branch => "kafka_ssl_options"
 gem "manageiq-password",                "~>1.0",             :require => false
 gem "manageiq-postgres_ha_admin",       "~>3.2",             :require => false
 gem "manageiq-ssh-util",                "~>0.1.1",           :require => false
@@ -209,7 +209,7 @@ group :ovirt, :manageiq_default do
 end
 
 group :vmware, :manageiq_default do
-  manageiq_plugin "manageiq-providers-vmware"
+  gem "manageiq-providers-vmware", :git => "https://github.com/nasark/manageiq-providers-vmware", :branch => "set_non_rails_worker"
 end
 
 group :workflows, :manageiq_default do
@@ -273,7 +273,7 @@ group :web_socket, :manageiq_default do
 end
 
 group :appliance, :optional => true do
-  gem "manageiq-appliance_console",     "~>7.2",             :require => false
+  gem "manageiq-appliance_console",     "~>8.0",             :require => false
 end
 
 ### Development and test gems are excluded from appliance and container builds to reduce size and license issues
