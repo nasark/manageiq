@@ -547,12 +547,16 @@ class MiqServer < ApplicationRecord
   end
 
   def messaging_health_check
-    require 'manageiq-messaging'
-
     _log.info("Initiating messaging health check")
     broker = MiqQueue.messaging_client("health_check")
+    return if broker.nil?
+    _log.info("opened broker client connection")
+    _log.info("attempting to publish message")
     broker.publish_message(:service => "messaging-health-check", :message => "health check", :payload => {})
+    _log.info("published message")
+    _log.info("attempting to subscribe message")
     broker.subscribe_messages(:service => "messaging-health-check") { break }
+    _log.info("subscribed message")
   rescue => err
     _log.error("Messaging health check failed: #{err}")
     shutdown_and_exit(1)
