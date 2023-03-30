@@ -687,11 +687,11 @@ class MiqQueue < ApplicationRecord
       :encoding => ENV.fetch("MESSAGING_ENCODING", "json")
     }
 
-    if ENV["MESSAGING_ENABLE_SSL"].present?
+    if ENV["MESSAGING_KEYSTORE_PASSWORD"].present?
       options[:ssl] = true
-      options[:ca_file] = "/etc/pki/ca-trust/source/anchors/root.crt"
-      options[:keystore_location] = "/etc/pki/ca-trust/source/anchors/kafka.keystore.jks"
-      options[:keystore_password] = "nasar123"
+      options[:ca_file] = ENV.fetch("MESSAGING_SSL_CA", nil)
+      options[:keystore_location] = ENV.fetch("MESSAGING_KEYSTORE", nil)
+      options[:keystore_password] = ENV.fetch("MESSAGING_KEYSTORE_PASSWORD", nil)
     end
 
     options
