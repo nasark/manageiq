@@ -49,6 +49,7 @@ class MiqQueue < ApplicationRecord
       # internally the client will track the state of the connection and re-open it,
       # once it's available again - at least thats true for a stomp connection
       options = messaging_client_options&.merge(:client_ref => client_ref)
+      _log.info("messaging options: #{options}")
       return if options.nil?
 
       ManageIQ::Messaging::Client.open(options)
