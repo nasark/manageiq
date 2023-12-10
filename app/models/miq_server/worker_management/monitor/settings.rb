@@ -7,6 +7,7 @@ module MiqServer::WorkerManagement::Monitor::Settings
   end
 
   def reload_worker_settings
+    _log.info("RELOADING WORKER SETTINGS")
     sync_config
     reset_queue_messages
     notify_workers_of_config_change(Time.now.utc)
@@ -20,18 +21,26 @@ module MiqServer::WorkerManagement::Monitor::Settings
   end
 
   def sync_child_worker_settings
+    _log.info("SYNCING CHILD WORKER SETTINGS")
     child_worker_settings = {}
     MiqWorkerType.worker_classes.each do |worker_class|
+      _log.info("WORKER CLASS: #{worker_class}")
+      _log.info("WORKER SETTINGS: #{worker_class.worker_settings}")
+      _log.info("WORKER SETTINGS PATHS: #{worker_class.worker_settings_paths}")
+      _log.info("ADDITIONAL SETTINGS: #{get_additional_settings(worker_class.worker_settings_paths)}") unless worker_class.worker_settings_paths.empty?
       child_worker_settings[worker_class.settings_name] = worker_class.worker_settings
       child_worker_settings[worker_class.settings_name].merge!(get_additional_settings(worker_class.worker_settings_paths)) unless worker_class.worker_settings_paths.empty?
       check_settings_diff(child_worker_settings[worker_class.settings_name], worker_class) unless worker_class.rails_worker?
     end
 
+    _log.info("END CHILD WORKER SETTINGS: #{child_worker_settings}")
     @child_worker_settings = child_worker_settings
   end
 
   def sync_worker_monitor_settings
+    # _log.info("SYNCING WORKER MONITOR SETTINGS")
     @worker_monitor_settings = ::Settings.server.worker_monitor.to_hash
+    # _log.info("WORKER MONITOR SETTINGS: #{@worker_monitor_settings}")
     @worker_monitor_settings.keys.each do |k|
       @worker_monitor_settings[k] = @worker_monitor_settings[k].to_i_with_method if @worker_monitor_settings[k].respond_to?(:to_i_with_method)
     end
@@ -77,7 +86,9 @@ module MiqServer::WorkerManagement::Monitor::Settings
     return if @child_worker_settings.nil?
 
     old_settings = @child_worker_settings[worker_class.settings_name]
-
+    _log.info("OLD SETTINGS: #{old_settings}")
+    _log.info("NEW SETTINGS: #{new_settings}")
+    _log.info("DIFF: #{Vmdb::Settings::HashDiffer.changes(new_settings, old_settings)}")
     worker_class.restart_workers if Vmdb::Settings::HashDiffer.changes(new_settings, old_settings).any?
   end
 end

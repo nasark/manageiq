@@ -190,7 +190,7 @@ class MiqWorker < ApplicationRecord
 
   def self.fetch_worker_settings_from_server(miq_server, options = {})
     return {} unless miq_server
-
+    _log.info("FETCHIING WORKER SETTINGS FROM SERVER")
     # TODO: commit bb15370a2131e5a8f02f63de334959685b68d620 added the conditional here
     # to prefer the passed in options before using the server settings for bug 998991,
     # bug 1004455, bug 1004459.  We'll keep this logic for now.
@@ -207,20 +207,27 @@ class MiqWorker < ApplicationRecord
     section = options_hash[:workers]
     unless section.nil?
       classes = path_to_my_worker_settings
+      _log.info("CLASSES: #{classes}")
+      _log.info("SECTIONS: #{section}")
       classes.each do |c|
         section = section[c]
         raise _("Missing config section %{section_name}") % {:section_name => c} if section.nil?
 
+        _log.info("SECTION FOR CLASS #{c}: #{section}")
         defaults = section[:defaults]
         unless defaults.nil?
+          _log.info("DEFAULTS: #{defaults}")
           defaults.delete_if { |_k, v| v == Vmdb::Settings::RESET_VALUE }
           settings.merge!(defaults)
+          _log.info("SETTINGS AFTER DEFAULT MERGE: #{settings}")
         end
       end
 
       section.delete_if { |_k, v| v == Vmdb::Settings::RESET_VALUE }
       settings.merge!(section)
+      _log.info("SETTINGS AFTER SECTION MERGE: #{settings}")
       normalize_settings!(settings) unless raw == true
+      _log.info("SETTINGS AFTER NORMALIZED: #{settings}")
     end
 
     settings
