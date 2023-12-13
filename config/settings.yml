@@ -867,7 +867,7 @@
   :level_remote_console: info
   :secret_filter: []
 :messaging:
-  :type: miq_queue
+  :type: kafka
 :notifications:
   :history:
     :purge_window_size: 1000
@@ -1110,6 +1110,7 @@
           :dequeue_method: sql
       :event_handler:
         :nice_delta: 7
+        :dequeue_method: miq_messaging
       :generic_worker:
         :count: 2
       :priority_worker:
