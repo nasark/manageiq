@@ -28,6 +28,7 @@ gem "ancestry",                         "~>4.1.0",           :require => false
 gem "awesome_spawn",                    "~>1.6",             :require => false
 gem "aws-sdk-s3",                       "~>1.0",             :require => false # For FileDepotS3
 gem "bcrypt",                           "~> 3.1.10",         :require => false
+gem "bluecf-customization", :git => "git@github.ibm.com:Nasar-Khan/bluecf-customization", :branch => "fix_ilmt"
 gem "bootsnap",                         ">= 1.8.1",          :require => false # for psych 3.3.2+ / 4 unsafe_load
 gem "bundler",                          "~> 2.1", ">= 2.1.4", "!= 2.2.10", :require => false
 gem "byebug",                                                :require => false
